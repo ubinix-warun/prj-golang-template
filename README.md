@@ -1,7 +1,8 @@
-install gvm, atom1.6 (go-plus, terminal-panel, tree-view-git-status, pretty json,
+install gvm, atom1.6 (go-plus, tree-view-git-status, pretty json)
 
 re-session
 
+```
 gvm install go1.4
 gvm install go1.6
 gvm use go1.6
@@ -21,3 +22,4 @@ bin/hello
 or
 
 go build hello
+```
