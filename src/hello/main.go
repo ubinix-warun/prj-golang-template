@@ -9,12 +9,25 @@ import (
 )
 
 func main() {
-	fmt.Println(":8080 'hello world'")
+	fmt.Println(":8080/hello 'hello world'")
 
 	api := rest.NewApi()
+	statusMw := &rest.StatusMiddleware{}
+	api.Use(statusMw)
 	api.Use(rest.DefaultDevStack...)
-	api.SetApp(rest.AppSimple(func(w rest.ResponseWriter, r *rest.Request) {
-		w.WriteJson(map[string]string{"Body": echo.Echo("hello world")})
-	}))
-	log.Fatal(http.ListenAndServe(":8080", api.MakeHandler()))
+	router, err := rest.MakeRouter(
+		rest.Get("/.status", func(w rest.ResponseWriter, r *rest.Request) {
+			w.WriteJson(statusMw.GetStatus())
+		}),
+		rest.Get("/hello", func(w rest.ResponseWriter, req *rest.Request) {
+			w.WriteJson(map[string]string{"Body": echo.Echo("hello world")})
+		}),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	api.SetApp(router)
+	http.Handle("/api/", http.StripPrefix("/api", api.MakeHandler()))
+	http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("."))))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
