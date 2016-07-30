@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
+	//"golang.org/x/net/html"
 )
 
 func echoHandler() http.HandlerFunc {
@@ -26,14 +27,13 @@ type Config struct {
 var in = `{
     "links": [
         {
-            "Url": "127.0.0.1:17001"
+            "Url": "http://www.google.com"
         },
         {
-            "Url": "127.0.0.1:17002"
+            "Url": "http://kapook.com"
         }
     ]
 }`
-
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("view")
@@ -44,8 +44,45 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Print("Error:", err)
 	}
 
-	fmt.Printf("%#v\n", conf)
-	fmt.Printf("%s\n",conf.Links[0].Url)
+	for _,element := range conf.Links {
+		// element is the element from someSlice for where we are
+		//fmt.Fprintf(w, "<h1>%s</h1>", element.Url)
+		resp, _ := http.Get(element.Url)
+		//b, _ := ioutil.ReadAll(resp.Body)
+
+		//fmt.Println("HTML:\n\n", string(bytes))
+		//
+
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+		// Parse HTML for Anchor Tags //
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+		//z := html.NewTokenizer(resp.Body)
+		//
+		//for {
+		//	tt := z.Next()
+		//
+		//	switch {
+		//	case tt == html.ErrorToken:
+		//		// End of the document, we're done
+		//		return
+		//	//break;
+		//	case tt == html.StartTagToken:
+		//		t := z.Token()
+		//
+		//		isAnchor := t.Data == "title"
+		//		if isAnchor {
+		//			fmt.Println("We found a link!")
+		//		}
+		//	}
+		//}
+
+		resp.Body.Close()
+
+	}
+
+	//fmt.Printf("%#v\n", conf)
+	//fmt.Printf("%s\n",conf.Links[0].Url)
 }
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
