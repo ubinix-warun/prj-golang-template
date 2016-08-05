@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
-	//"golang.org/x/net/html"
+	"golang.org/x/net/html"
 )
 
 func echoHandler() http.HandlerFunc {
@@ -57,25 +57,38 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		// Parse HTML for Anchor Tags //
 		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-		//z := html.NewTokenizer(resp.Body)
-		//
-		//for {
-		//	tt := z.Next()
-		//
-		//	switch {
-		//	case tt == html.ErrorToken:
-		//		// End of the document, we're done
-		//		return
-		//	//break;
-		//	case tt == html.StartTagToken:
-		//		t := z.Token()
-		//
-		//		isAnchor := t.Data == "title"
-		//		if isAnchor {
-		//			fmt.Println("We found a link!")
-		//		}
-		//	}
-		//}
+		z := html.NewTokenizer(resp.Body)
+		flag:= 0
+
+		for {
+			tt := z.Next()
+			if tt == html.ErrorToken {
+				break
+			}
+
+			switch {
+			//case tt == html.ErrorToken:
+				// End of the document, we're done
+				//break
+			//break;
+			case tt == html.StartTagToken:
+				t := z.Token()
+
+				flag = 0
+				isAnchor := t.Data == "title"
+				if isAnchor {
+					flag = 1
+					//fmt.Println("We found a link!")
+				}
+			case tt == html.TextToken:
+				t:= z.Token()
+				if flag == 1 {
+					fmt.Fprintf(w, "<h1>%s</h1>", t)
+					//fmt.Println(t)
+				}
+			}
+
+		}
 
 		resp.Body.Close()
 
