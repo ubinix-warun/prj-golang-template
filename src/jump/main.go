@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"golang.org/x/net/html"
 	"strconv"
+	"io/ioutil"
+	"os"
 )
 
 type Link struct {
@@ -17,6 +19,7 @@ type Config struct {
 	Links []Link
 }
 
+/*
 var in = `{
     "links": [
         {
@@ -27,6 +30,7 @@ var in = `{
         }
     ]
 }`
+*/
 
 var conf Config
 
@@ -113,7 +117,13 @@ func main() {
 	fmt.Println(":8080/view")
 	fmt.Println(":8080/page?id=x")
 
-	err := json.Unmarshal([]byte(in), &conf)
+	raw, err := ioutil.ReadFile("./pages.json")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	err = json.Unmarshal(raw, &conf)
 
 	if err != nil {
 		fmt.Print("Error:", err)
